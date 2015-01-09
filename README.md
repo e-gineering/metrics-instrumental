@@ -1,4 +1,4 @@
-# A Dropwizard Metrics reporter for Instrumental
+# metrics-instrumental
 
 This is a reporter for the [Dropwizard Metrics library](http://dropwizard.github.io/metrics) which publishes metrics to [Instrumental](http://instrumentalapp.com), a cloud-based metrics tool.
 
