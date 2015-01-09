@@ -1,4 +1,4 @@
-# metrics-instrumental
+# metrics-instrumental [![Build Status](https://travis-ci.org/egineering-llc/metrics-instrumental.svg?branch=master)](https://travis-ci.org/egineering-llc/metrics-instrumental)
 
 This is a reporter for the [Dropwizard Metrics library](http://dropwizard.github.io/metrics) which publishes metrics to [Instrumental](http://instrumentalapp.com), a cloud-based metrics tool.
 
