@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.egineering.metrics.instrumental;
+package com.e_gineering.metrics.instrumental;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.Counter;
