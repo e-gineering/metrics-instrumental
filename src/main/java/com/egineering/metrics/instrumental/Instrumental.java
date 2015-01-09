@@ -1,3 +1,18 @@
+/**
+ * Copyright 2015 E-Gineering, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.egineering.metrics.instrumental;
 
 import javax.net.SocketFactory;
@@ -10,7 +25,9 @@ import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * Created by bvarner on 1/6/15.
+ * Creates a reporting connection to Instrumental.
+ *
+ * Largely based upon the graphite reporting module from Dropwizard Metrics.
  */
 public class Instrumental implements InstrumentalSender {
 
@@ -27,6 +44,24 @@ public class Instrumental implements InstrumentalSender {
 	public Socket socket = null;
 	private int failures;
 
+	/**
+	 * Creates a connection to Instrumentalapp.com, using the default collector URI, Port, and SocketFactory.
+	 *
+	 * @param apiKey Your project API key.
+	 */
+	public Instrumental(String apiKey) {
+		this(apiKey, "collector.instrumentalapp.com", 8000);
+	}
+
+	/**
+	 * Creates a connection to instrumentalapp.com, using the default collector URI, port, and specified SocketFactory.
+	 *
+	 * @param apiKey Your project API key.
+	 * @param socketFactory A SocketFactory to use when creating the underlying socket.
+	 */
+	public Instrumental(String apiKey, SocketFactory socketFactory) {
+		this(apiKey, "collector.instrumentalapp.com", 8000, socketFactory);
+	}
 
 	public Instrumental(String apiKey, String hostname, int port) {
 		this(apiKey, hostname, port, SocketFactory.getDefault());
