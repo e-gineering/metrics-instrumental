@@ -16,10 +16,13 @@
 package com.e_gineering.metrics.instrumental;
 
 import javax.net.SocketFactory;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -118,18 +121,32 @@ public class Instrumental implements InstrumentalSender {
 		socket.setKeepAlive(true);
 		socket.setTrafficClass(0x04 | 0x10); // Reliability, low-delay
 		socket.setPerformancePreferences(0, 2, 1); // latency more important than bandwidth and connection time.
+		socket.setSoTimeout(5000);
 		if (address.isUnresolved()) {
 			throw new UnknownHostException(address.getHostName());
 		}
 		socket.connect(address);
 
+		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ASCII"));
+
 		String hello = "hello version java/metrics_instrumental/" + getVersion() + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
 		socket.getOutputStream().write(hello.getBytes(ASCII));
 		socket.getOutputStream().write(LF);
 		socket.getOutputStream().flush();
+
+		if (!"ok".equals(reader.readLine())) {
+			close();
+			throw new ProtocolException("hello failed");
+		}
+
 		socket.getOutputStream().write(("authenticate " + apiKey).getBytes(ASCII));
 		socket.getOutputStream().write(LF);
 		socket.getOutputStream().flush();
+
+		if (!"ok".equals(reader.readLine())) {
+			close();
+			throw new ProtocolException("authenticate failed");
+		}
 	}
 
 	@Override
@@ -160,14 +177,36 @@ public class Instrumental implements InstrumentalSender {
 		}
 	}
 
+
+	/**
+	 * Sends a named Notice at the current system time, with no duration to Instrumental
+	 *
+	 * @param name The text of the notice.
+	 */
 	public void notice(String name) {
 		notice(name, 0, TimeUnit.SECONDS);
 	}
 
+	/**
+	 * Sends a named Notice at the current system time, with the given duration.
+	 *
+	 * @param name The text of the notice
+	 * @param duration Period duration.
+	 * @param durationUnit Period TimeUnit.
+	 */
 	public void notice(String name, long duration, TimeUnit durationUnit) {
 		notice(name, System.currentTimeMillis(), TimeUnit.MILLISECONDS, duration, durationUnit);
 	}
 
+	/**
+	 * Sends a named Notice at the given start time for the given duration.
+	 *
+	 * @param name The text of the notice
+	 * @param start When the notice started (Measure in wall-clock time like unix timestamp since 1970)
+	 * @param startUnit start TimeUnit (ie, MILLISECONDS, or SECONDS, etc.)
+	 * @param duration Period duration.
+	 * @param durationUnit Period TimeUnit.
+	 */
 	public void notice(String name, long start, TimeUnit startUnit, long duration, TimeUnit durationUnit) {
 		try {
 			if (!isConnected()) {
