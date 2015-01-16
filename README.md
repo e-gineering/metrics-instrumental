@@ -10,7 +10,7 @@ If you're using maven, add the following dependency
 <dependency>
   <groupId>com.e-gineering</groupId>
   <artifactId>metrics-instrumental</artifactId>
-  <version>3.1.0</version>
+  <version>3.1.0.1</version>
 </dependency>
 ```
 
@@ -18,6 +18,7 @@ Then, somewhere in your code, create an Instrumental instance with your api key,
 
 ```
 Instrumental instrumental = new Instrumental("your_api_key");
+instrumental.notice("Starting up...");
 InstrumentalReporter instrumentalReporter = InstrumentalReporter.forRegistry(registry)
                                                                 .convertRatesTo(TimeUnit.SECONDS)
                                                                 .convertDurationsTo(TimeUnit.MILLISECONDS)

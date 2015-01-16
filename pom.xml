@@ -9,7 +9,7 @@
 
     <groupId>com.e-gineering</groupId>
     <artifactId>metrics-instrumental</artifactId>
-    <version>3.1.0.1-SNAPSHOT</version>
+    <version>3.1.0.1</version>
 
     <name>Metrics Reporting Provider for instrumentalapp.com</name>
     <packaging>bundle</packaging>
