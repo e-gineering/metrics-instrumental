@@ -17,6 +17,7 @@ package com.e_gineering.metrics.instrumental;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An abstraction for sending data to Instrumental, in case future protocol changes force supporting more than
@@ -25,9 +26,16 @@ import java.io.IOException;
  * Largely based upon the graphite reporting module from Dropwizard Metrics.
  */
 public interface InstrumentalSender extends Closeable {
+
 	public void connect() throws IllegalStateException, IOException;
 
-	public void send(String name, String value, long timestamp) throws IOException;
+	public void send(MetricType type, String name, String value, long timestamp) throws IOException;
+
+	public void notice(String name);
+
+	public void notice(String name, long duration, TimeUnit durationUnit);
+
+	public void notice(String name, long start, TimeUnit startUnit, long duration, TimeUnit durationUnit);
 
 	void flush() throws IOException;
 

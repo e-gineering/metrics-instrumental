@@ -40,6 +40,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static com.e_gineering.metrics.instrumental.MetricType.*;
 
 public class InstrumentalReporterTest {
     private final long timestamp = 1000198;
@@ -70,7 +71,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental, never()).send("prefix.gauge", "value", timestamp);
+        inOrder.verify(instrumental, never()).send(GAUGE, "prefix.gauge", "value", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -87,7 +88,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -104,7 +105,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -121,7 +122,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -138,7 +139,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -155,7 +156,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.10", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -172,7 +173,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.gauge", "1.10", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -192,7 +193,7 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.counter.count", "100", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.counter.count", "100", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -226,17 +227,17 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.histogram.count", "1", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.max", "2", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.mean", "3.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.min", "4", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.stddev", "5.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p50", "6.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p75", "7.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p95", "8.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p98", "9.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p99", "10.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.histogram.p999", "11.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.count", "1", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.max", "2", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.mean", "3.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.min", "4", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.stddev", "5.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p50", "6.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p75", "7.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p95", "8.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p98", "9.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p99", "10.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.histogram.p999", "11.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -260,11 +261,11 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.meter.count", "1", timestamp);
-        inOrder.verify(instrumental).send("prefix.meter.m1_rate", "2.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.meter.m5_rate", "3.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.meter.m15_rate", "4.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.meter.mean_rate", "5.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.meter.count", "1", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.meter.m1_rate", "2.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.meter.m5_rate", "3.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.meter.m15_rate", "4.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.meter.mean_rate", "5.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);
@@ -303,21 +304,21 @@ public class InstrumentalReporterTest {
         final InOrder inOrder = inOrder(instrumental);
         inOrder.verify(instrumental).isConnected();
         inOrder.verify(instrumental).connect();
-        inOrder.verify(instrumental).send("prefix.timer.max", "100.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.mean", "200.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.min", "300.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.stddev", "400.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p50", "500.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p75", "600.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p95", "700.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p98", "800.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p99", "900.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.p999", "1000.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.count", "1", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.m1_rate", "3.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.m5_rate", "4.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.m15_rate", "5.00", timestamp);
-        inOrder.verify(instrumental).send("prefix.timer.mean_rate", "2.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.max", "100.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.mean", "200.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.min", "300.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.stddev", "400.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p50", "500.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p75", "600.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p95", "700.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p98", "800.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p99", "900.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.p999", "1000.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.count", "1", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.m1_rate", "3.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.m5_rate", "4.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.m15_rate", "5.00", timestamp);
+        inOrder.verify(instrumental).send(GAUGE, "prefix.timer.mean_rate", "2.00", timestamp);
         inOrder.verify(instrumental).flush();
 
         verifyNoMoreInteractions(instrumental);

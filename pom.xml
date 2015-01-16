@@ -9,7 +9,7 @@
 
     <groupId>com.e-gineering</groupId>
     <artifactId>metrics-instrumental</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.0.1</version>
 
     <name>Metrics Reporting Provider for instrumentalapp.com</name>
     <packaging>bundle</packaging>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${project.version}</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -91,6 +91,15 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
