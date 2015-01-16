@@ -43,7 +43,6 @@ public class Instrumental implements InstrumentalSender {
 	private static final Pattern COMMA_SPACE = Pattern.compile(", ");
 	private static final Pattern ACCEPTED_NAMES = Pattern.compile("[^A-Za-z0-9_\\-\\.]");
 
-
 	private static final Charset ASCII = Charset.forName("ASCII");
 	private static byte[] LF = "\n".getBytes(ASCII);
 
@@ -318,5 +317,4 @@ public class Instrumental implements InstrumentalSender {
 	protected String sanitize(String s) {
 		return WHITESPACE.matcher(s).replaceAll(".");
 	}
-
 }

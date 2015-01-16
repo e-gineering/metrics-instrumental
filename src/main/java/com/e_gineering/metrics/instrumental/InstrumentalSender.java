@@ -26,12 +26,15 @@ import java.util.concurrent.TimeUnit;
  * Largely based upon the graphite reporting module from Dropwizard Metrics.
  */
 public interface InstrumentalSender extends Closeable {
+
 	public void connect() throws IllegalStateException, IOException;
 
 	public void send(MetricType type, String name, String value, long timestamp) throws IOException;
 
 	public void notice(String name);
+
 	public void notice(String name, long duration, TimeUnit durationUnit);
+
 	public void notice(String name, long start, TimeUnit startUnit, long duration, TimeUnit durationUnit);
 
 	void flush() throws IOException;
