@@ -128,7 +128,7 @@ public class Instrumental implements InstrumentalSender {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ASCII"));
 
-		String hello = "hello version java/metrics_instrumental/" + getVersion() + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
+		String hello = "hello version java/metrics_instrumental/" + InstrumentalVersion.VERSION + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
 		socket.getOutputStream().write(hello.getBytes(ASCII));
 		socket.getOutputStream().write(LF);
 		socket.getOutputStream().flush();
@@ -282,32 +282,6 @@ public class Instrumental implements InstrumentalSender {
 
 	private static String getRuntimeInfo() {
 		return System.getProperty("java.vendor", "java").replaceAll(" ", "_") + "/" + System.getProperty("java.version", "?").replaceAll(" ", "_");
-	}
-
-	private String getVersion() {
-		if (version == null) {
-			Properties props = new Properties();
-			InputStream stream = null;
-			try {
-				stream = this.getClass().getClassLoader().getResourceAsStream("instrumental.properties");
-				props.load(stream);
-			} catch (IOException ioe) {
-
-			} finally {
-				if (stream != null) {
-					try {
-						stream.close();
-					} catch (IOException ioe) {
-						// Nill
-					} finally {
-						stream = null;
-					}
-				}
-			}
-
-			version = props.getProperty("metrics-instrumental.version", "unknown.version");
-		}
-		return version;
 	}
 
 	protected String sanitizeName(String s) {
