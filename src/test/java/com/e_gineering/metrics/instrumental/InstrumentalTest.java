@@ -34,6 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static com.e_gineering.metrics.instrumental.MetricType.*;
 
 public class InstrumentalTest {
     private final String host = "example.com";
@@ -142,7 +143,7 @@ public class InstrumentalTest {
         instrumental = new Instrumental(apiKey, address, socketFactory);
         instrumental.connect();
         output.reset();
-        instrumental.send("name", "value", 100);
+        instrumental.send(GAUGE, "name", "value", 100);
         instrumental.close();
 
         assertThat(output.toString())
@@ -154,19 +155,20 @@ public class InstrumentalTest {
         instrumental = new Instrumental(apiKey, address, socketFactory);
         instrumental.connect();
         output.reset();
-        instrumental.send("name woo", "value", 100);
+        instrumental.send(GAUGE, "name woo/foo$bar.invoked(param1, param2)", "value", 100);
         instrumental.close();
 
         assertThat(output.toString())
-                .isEqualTo("gauge name.woo value 100\n");
+                .isEqualTo("gauge name.woo.foo.bar.invoked__param1-param2__ value 100\n");
     }
+
 
     @Test
     public void sanitizesValues() throws Exception {
         instrumental = new Instrumental(apiKey, address, socketFactory);
         instrumental.connect();
         output.reset();
-        instrumental.send("name", "value woo", 100);
+        instrumental.send(GAUGE, "name", "value woo", 100);
         instrumental.close();
 
         assertThat(output.toString())

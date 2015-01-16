@@ -17,11 +17,14 @@ package com.e_gineering.metrics.instrumental;
 
 import javax.net.SocketFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -32,9 +35,16 @@ import java.util.regex.Pattern;
 public class Instrumental implements InstrumentalSender {
 
 	private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
+
+	private static final Pattern PARENS = Pattern.compile("[\\(\\)]+");
+	private static final Pattern COMMA_SPACE = Pattern.compile(", ");
+	private static final Pattern ACCEPTED_NAMES = Pattern.compile("[^A-Za-z0-9_\\-\\.]");
+
+
 	private static final Charset ASCII = Charset.forName("ASCII");
 	private static byte[] LF = "\n".getBytes(ASCII);
 
+	private String version;
 	private String hostname;
 	private int port;
 	private String apiKey;
@@ -68,6 +78,7 @@ public class Instrumental implements InstrumentalSender {
 	}
 
 	public Instrumental(String apiKey, String hostname, int port, SocketFactory socketFactory) {
+		this.version = null;
 		this.hostname = hostname;
 		this.port = port;
 		this.apiKey = apiKey;
@@ -80,6 +91,7 @@ public class Instrumental implements InstrumentalSender {
 	}
 
 	public Instrumental(String apiKey, InetSocketAddress address, SocketFactory socketFactory) {
+		this.version = null;
 		this.hostname = null;
 		this.port = -1;
 		this.apiKey = apiKey;
@@ -111,7 +123,7 @@ public class Instrumental implements InstrumentalSender {
 		}
 		socket.connect(address);
 
-		String hello = "hello version java/metrics_instrumental/3.1.1 hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
+		String hello = "hello version java/metrics_instrumental/" + getVersion() + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
 		socket.getOutputStream().write(hello.getBytes(ASCII));
 		socket.getOutputStream().write(LF);
 		socket.getOutputStream().flush();
@@ -126,14 +138,15 @@ public class Instrumental implements InstrumentalSender {
 	}
 
 	@Override
-	public void send(String name, String value, long timestamp) throws IOException {
+	public void send(MetricType type, String name, String value, long timestamp) throws IOException {
 		if (!isConnected()) {
 			connect();
 		}
 
 		try {
-			StringBuilder buf = new StringBuilder("gauge ");
-			buf.append(sanitize(name));
+			StringBuilder buf = new StringBuilder(type.getProtocolKey());
+			buf.append(' ');
+			buf.append(sanitizeName(name));
 			buf.append(' ');
 			buf.append(sanitize(value));
 			buf.append(' ');
@@ -144,6 +157,43 @@ public class Instrumental implements InstrumentalSender {
 		} catch (IOException ioe) {
 			failures++;
 			throw ioe;
+		}
+	}
+
+	public void notice(String name) {
+		notice(name, 0, TimeUnit.SECONDS);
+	}
+
+	public void notice(String name, long duration, TimeUnit durationUnit) {
+		notice(name, System.currentTimeMillis(), TimeUnit.MILLISECONDS, duration, durationUnit);
+	}
+
+	public void notice(String name, long start, TimeUnit startUnit, long duration, TimeUnit durationUnit) {
+		try {
+			if (!isConnected()) {
+				connect();
+			}
+
+			try {
+				StringBuilder buf = new StringBuilder("notice ");
+				buf.append(Long.toString(TimeUnit.SECONDS.convert(start, startUnit)));
+				buf.append(' ');
+				buf.append(Long.toString(TimeUnit.SECONDS.convert(duration, durationUnit)));
+				buf.append(' ');
+				buf.append(sanitizeName(name));
+				buf.append('\n');
+				socket.getOutputStream().write(buf.toString().getBytes(ASCII));
+				this.failures = 0;
+			} catch (IOException ioe) {
+				failures++;
+				throw ioe;
+			}
+		} catch (IOException ioe) {
+			try {
+				close();
+			} catch (IOException e) {
+				// Eat it.
+			}
 		}
 	}
 
@@ -196,9 +246,38 @@ public class Instrumental implements InstrumentalSender {
 		return System.getProperty("java.vendor", "java").replaceAll(" ", "_") + "/" + System.getProperty("java.version", "?").replaceAll(" ", "_");
 	}
 
+	private String getVersion() {
+		if (version == null) {
+			Properties props = new Properties();
+			InputStream stream = null;
+			try {
+				stream = this.getClass().getClassLoader().getResourceAsStream("instrumental.properties");
+				props.load(stream);
+			} catch (IOException ioe) {
+
+			} finally {
+				if (stream != null) {
+					try {
+						stream.close();
+					} catch (IOException ioe) {
+						// Nill
+					} finally {
+						stream = null;
+					}
+				}
+			}
+
+			version = props.getProperty("metrics-instrumental.version", "unknown.version");
+		}
+		return version;
+	}
+
+	protected String sanitizeName(String s) {
+		return ACCEPTED_NAMES.matcher(PARENS.matcher(COMMA_SPACE.matcher(s).replaceAll("-")).replaceAll("__")).replaceAll(".");
+	}
+
 	protected String sanitize(String s) {
 		return WHITESPACE.matcher(s).replaceAll(".");
 	}
-
 
 }

@@ -213,28 +213,28 @@ public class InstrumentalReporter extends ScheduledReporter {
 	private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
 		final Snapshot snapshot = timer.getSnapshot();
 
-		instrumental.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-		instrumental.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-		instrumental.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-		instrumental.send(prefix(name, "stddev"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "stddev"),
 				             format(convertDuration(snapshot.getStdDev())),
 				             timestamp);
-		instrumental.send(prefix(name, "p50"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p50"),
 				             format(convertDuration(snapshot.getMedian())),
 				             timestamp);
-		instrumental.send(prefix(name, "p75"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p75"),
 				             format(convertDuration(snapshot.get75thPercentile())),
 				             timestamp);
-		instrumental.send(prefix(name, "p95"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p95"),
 				             format(convertDuration(snapshot.get95thPercentile())),
 				             timestamp);
-		instrumental.send(prefix(name, "p98"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p98"),
 				             format(convertDuration(snapshot.get98thPercentile())),
 				             timestamp);
-		instrumental.send(prefix(name, "p99"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p99"),
 				             format(convertDuration(snapshot.get99thPercentile())),
 				             timestamp);
-		instrumental.send(prefix(name, "p999"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "p999"),
 				             format(convertDuration(snapshot.get999thPercentile())),
 				             timestamp);
 
@@ -242,44 +242,44 @@ public class InstrumentalReporter extends ScheduledReporter {
 	}
 
 	private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
-		instrumental.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-		instrumental.send(prefix(name, "m1_rate"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "count"), format(meter.getCount()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "m1_rate"),
 				             format(convertRate(meter.getOneMinuteRate())),
 				             timestamp);
-		instrumental.send(prefix(name, "m5_rate"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "m5_rate"),
 				             format(convertRate(meter.getFiveMinuteRate())),
 				             timestamp);
-		instrumental.send(prefix(name, "m15_rate"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "m15_rate"),
 				             format(convertRate(meter.getFifteenMinuteRate())),
 				             timestamp);
-		instrumental.send(prefix(name, "mean_rate"),
+		instrumental.send(MetricType.GAUGE, prefix(name, "mean_rate"),
 				             format(convertRate(meter.getMeanRate())),
 				             timestamp);
 	}
 
 	private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
 		final Snapshot snapshot = histogram.getSnapshot();
-		instrumental.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-		instrumental.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-		instrumental.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-		instrumental.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-		instrumental.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-		instrumental.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-		instrumental.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-		instrumental.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-		instrumental.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-		instrumental.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-		instrumental.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "count"), format(histogram.getCount()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "max"), format(snapshot.getMax()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "min"), format(snapshot.getMin()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
 	}
 
 	private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-		instrumental.send(prefix(name, "count"), format(counter.getCount()), timestamp);
+		instrumental.send(MetricType.GAUGE, prefix(name, "count"), format(counter.getCount()), timestamp);
 	}
 
 	private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
 		final String value = format(gauge.getValue());
 		if (value != null) {
-			instrumental.send(prefix(name), value, timestamp);
+			instrumental.send(MetricType.GAUGE, prefix(name), value, timestamp);
 		}
 	}
 
