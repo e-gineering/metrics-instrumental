@@ -23,7 +23,7 @@ long start = System.nanoTime();
 Instrumental instrumental = new Instrumental("your_api_key");
 
 // Wrap it in an asynch streamer and send things to Instrumental yourself.
-InstrumentalStreamer streamer = new InstrumentalStreamer(instrumental, Executors.newSingleThreadScheduledExecutor());
+InstrumentalStreamer streamer = new InstrumentalStreamer(instrumental, Executors.newSingleThreadExecutor());
 streamer.notice("Starting up!"); // This will not block for I/O.
 streamer.notice("Really Starting up!", true); // This will block for I/O.
 
