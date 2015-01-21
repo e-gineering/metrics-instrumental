@@ -8,7 +8,7 @@ If you're using DropWizard Metrics you can make use of the [InstrumentalReporter
 ## Example Usage
 If you're using maven, add the following dependency
 
-```
+```xml
 <dependency>
   <groupId>com.e-gineering</groupId>
   <artifactId>metrics-instrumental</artifactId>
