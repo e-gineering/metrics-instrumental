@@ -107,6 +107,7 @@ public class InstrumentalStreamer implements InstrumentalSender, Closeable {
 	public void send(MetricType type, String name, String value, long timestamp, boolean synchronous) throws IOException {
 		if (synchronous) {
 			delegate.send(type, name, value, timestamp);
+			delegate.flush();
 		} else {
 			executorService.submit(new MetricPoster(type, name, value, timestamp));
 		}
@@ -139,6 +140,9 @@ public class InstrumentalStreamer implements InstrumentalSender, Closeable {
 	public void notice(String name, long start, TimeUnit startUnit, long duration, TimeUnit durationUnit, boolean synchronous) {
 		if (synchronous) {
 			delegate.notice(name, start, startUnit, duration, durationUnit);
+			try {
+				delegate.flush();
+			} catch (IOException ioe) { }
 		} else {
 			executorService.submit(new NoticePoster(name, start, startUnit, duration, durationUnit));
 		}
