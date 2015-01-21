@@ -27,6 +27,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,6 @@ public class Instrumental implements InstrumentalSender {
 	private static final Charset ASCII = Charset.forName("ASCII");
 	private static byte[] LF = "\n".getBytes(ASCII);
 
-	private String version;
 	private String hostname;
 	private int port;
 	private String apiKey;
@@ -80,7 +80,6 @@ public class Instrumental implements InstrumentalSender {
 	}
 
 	public Instrumental(String apiKey, String hostname, int port, SocketFactory socketFactory) {
-		this.version = null;
 		this.hostname = hostname;
 		this.port = port;
 		this.apiKey = apiKey;
@@ -93,7 +92,6 @@ public class Instrumental implements InstrumentalSender {
 	}
 
 	public Instrumental(String apiKey, InetSocketAddress address, SocketFactory socketFactory) {
-		this.version = null;
 		this.hostname = null;
 		this.port = -1;
 		this.apiKey = apiKey;
