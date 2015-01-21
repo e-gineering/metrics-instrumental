@@ -18,7 +18,7 @@ If you're using maven, add the following dependency
 
 Then, somewhere in your code, create an Instrumental instance with your api key, and use it!
 
-```
+```java
 long start = System.nanoTime();
 Instrumental instrumental = new Instrumental("your_api_key");
 
