@@ -12,7 +12,7 @@ If you're using maven, add the following dependency
 <dependency>
   <groupId>com.e-gineering</groupId>
   <artifactId>metrics-instrumental</artifactId>
-  <version>3.1.0.2-SNAPSHOT</version>
+  <version>3.1.0.2</version>
 </dependency>
 ```
 
