@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 /**
@@ -52,6 +53,7 @@ public class Instrumental implements InstrumentalSender {
 
 	public Socket socket = null;
 	private int failures;
+	private final ReentrantLock sockLock = new ReentrantLock();
 
 	/**
 	 * Creates a connection to Instrumentalapp.com, using the default collector URI, Port, and SocketFactory.
@@ -110,36 +112,42 @@ public class Instrumental implements InstrumentalSender {
 			address = new InetSocketAddress(hostname, port);
 		}
 
-		socket = socketFactory.createSocket();
-		socket.setTcpNoDelay(true);
-		socket.setKeepAlive(true);
-		socket.setTrafficClass(0x04 | 0x10); // Reliability, low-delay
-		socket.setPerformancePreferences(0, 2, 1); // latency more important than bandwidth and connection time.
-		socket.setSoTimeout(5000);
-		if (address.isUnresolved()) {
-			throw new UnknownHostException(address.getHostName());
-		}
-		socket.connect(address);
+		sockLock.lock();
+		try {
+			socket = socketFactory.createSocket();
+			socket.setTcpNoDelay(true);
+			socket.setKeepAlive(true);
+			socket.setTrafficClass(0x04 | 0x10); // Reliability, low-delay
+			socket.setPerformancePreferences(0, 2, 1); // latency more important than bandwidth and connection time.
+			socket.setSoTimeout(5000);
+			if (address.isUnresolved()) {
+				throw new UnknownHostException(address.getHostName());
+			}
+			socket.connect(address);
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ASCII"));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ASCII"));
 
-		String hello = "hello version java/metrics_instrumental/" + InstrumentalVersion.VERSION + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
-		socket.getOutputStream().write(hello.getBytes(ASCII));
-		socket.getOutputStream().write(LF);
-		socket.getOutputStream().flush();
+			String hello =
+					"hello version java/metrics_instrumental/" + InstrumentalVersion.VERSION + " hostname " + socket.getLocalAddress().getHostName() + " pid " + getProcessId("?") + " runtime " + getRuntimeInfo() + " platform " + getPlatformInfo();
+			socket.getOutputStream().write(hello.getBytes(ASCII));
+			socket.getOutputStream().write(LF);
+			socket.getOutputStream().flush();
 
-		if (!"ok".equals(reader.readLine())) {
-			close();
-			throw new ProtocolException("hello failed");
-		}
+			if (!"ok".equals(reader.readLine())) {
+				close();
+				throw new ProtocolException("hello failed");
+			}
 
-		socket.getOutputStream().write(("authenticate " + apiKey).getBytes(ASCII));
-		socket.getOutputStream().write(LF);
-		socket.getOutputStream().flush();
+			socket.getOutputStream().write(("authenticate " + apiKey).getBytes(ASCII));
+			socket.getOutputStream().write(LF);
+			socket.getOutputStream().flush();
 
-		if (!"ok".equals(reader.readLine())) {
-			close();
-			throw new ProtocolException("authenticate failed");
+			if (!"ok".equals(reader.readLine())) {
+				close();
+				throw new ProtocolException("authenticate failed");
+			}
+		} finally {
+			sockLock.unlock();
 		}
 	}
 
@@ -163,11 +171,14 @@ public class Instrumental implements InstrumentalSender {
 			buf.append(' ');
 			buf.append(Long.toString(timestamp));
 			buf.append('\n');
+			sockLock.lock();
 			socket.getOutputStream().write(buf.toString().getBytes(ASCII));
 			this.failures = 0;
 		} catch (IOException ioe) {
 			failures++;
 			throw ioe;
+		} finally {
+			sockLock.unlock();
 		}
 	}
 
@@ -215,11 +226,14 @@ public class Instrumental implements InstrumentalSender {
 				buf.append(' ');
 				buf.append(sanitizeName(name));
 				buf.append('\n');
+				sockLock.lock();
 				socket.getOutputStream().write(buf.toString().getBytes(ASCII));
 				this.failures = 0;
 			} catch (IOException ioe) {
 				failures++;
 				throw ioe;
+			} finally {
+				sockLock.unlock();
 			}
 		} catch (IOException ioe) {
 			try {
@@ -238,15 +252,25 @@ public class Instrumental implements InstrumentalSender {
 	@Override
 	public void flush() throws IOException {
 		if (isConnected()) {
-			socket.getOutputStream().flush();
+			sockLock.lock();
+			try {
+				socket.getOutputStream().flush();
+			} finally {
+				sockLock.unlock();
+			}
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
 		if (isConnected()) {
-			socket.shutdownOutput();
-			socket.close();
+			sockLock.lock();
+			try {
+				socket.shutdownOutput();
+				socket.close();
+			} finally {
+				sockLock.unlock();
+			}
 		}
 	}
 
