@@ -18,7 +18,6 @@ package com.e_gineering.metrics.instrumental;
 import javax.net.SocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
@@ -26,8 +25,6 @@ import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.Properties;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
